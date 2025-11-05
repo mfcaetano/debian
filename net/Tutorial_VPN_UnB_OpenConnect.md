@@ -59,10 +59,8 @@ Ao conectar, o cliente pedirá:
 
 Exemplo de configuração no GNOME NetworkManager:
 
-![GNOME Configuração NetworkManager](img/GNOME_Configuracao_NetworkManager.png){ width=70% }
+<img src="img/GNOME_Configuracao_NetworkManager.png" alt="GNOME Configuração NetworkManager" width="60%">
 
-<!-- Ou use HTML para mais controle: -->
-<!-- <img src="img/GNOME_Configuracao_NetworkManager.png" alt="GNOME Configuração NetworkManager" width="600"> -->
 
 ## 5. Teste via linha de comando (opcional)
 
