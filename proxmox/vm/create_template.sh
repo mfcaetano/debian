@@ -2,18 +2,27 @@
 set -ex
 
 IMAGE="$1"
-[[ -f "$IMAGE" ]] || exit 1
+[[ -f "$IMAGE" ]] || { echo "Image not found: $IMAGE"; exit 1; }
 
-FORMAT="$2"
+FORMAT="${2:-${IMAGE##*.}}"
+FORMAT="${FORMAT,,}"
 
-CPU_TYPE="x86-64-v2-AES"
+case "$FORMAT" in
+  raw|qcow2|vmdk) ;;
+  *)
+    echo "Invalid or unsupported format: $FORMAT"
+    exit 1
+    ;;
+esac
+
+CPU_TYPE="host"
 MEMORY="512"
 CPUS="2"
 DISK="32G"
 STORAGE="local-lvm"
 FILE_STORAGE=false
 BRIDGE="vmbr0"
-VLAN="3"
+VLAN="8"
 
 declare -A acronyms
 acronyms=(["jasnah"]="jsn" ["korra"]="kra" ["stormfather"]="sfr")
@@ -24,7 +33,18 @@ file_name="${base_name%.*}"
 vm_name="${file_name}-${host_acronym}"
 next_id=$(pvesh get /cluster/nextid)
 
-if [ "$FILE_STORAGE" = true]; then
+if [[ -n "${acronyms[$HOSTNAME]}" ]]; then
+  vm_name="${file_name}-${acronyms[$HOSTNAME]}"
+else
+  vm_name="$file_name"
+fi
+  
+if ! [[ "$vm_name" =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]]; then
+  echo "Invalid VM name: $vm_name"
+  exit 1
+fi
+
+if [ "$FILE_STORAGE" = true ]; then
     disk_path="${next_id}/vm-${next_id}-disk-0.${FORMAT}"
 else
     disk_path="vm-${next_id}-disk-0"
