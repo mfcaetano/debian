@@ -1,0 +1,33 @@
+api:
+  dashboard: true
+  insecure: true
+  debug: false
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: ":443"
+    http:
+      tls: true
+
+serversTransport:
+  insecureSkipVerify: true
+
+providers:
+  docker: {}
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: mfcaetano@mfcaetano.cc
+      storage: /certs/acme.json
+      httpChallenge:
+        entryPoint: web
+
