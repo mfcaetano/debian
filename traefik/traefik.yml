@@ -21,7 +21,8 @@ serversTransport:
   insecureSkipVerify: true
 
 providers:
-  docker: {}
+  docker:
+    exposedByDefault : false
 
 certificatesResolvers:
   letsencrypt:
