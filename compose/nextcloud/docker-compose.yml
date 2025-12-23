@@ -1,0 +1,43 @@
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - ./data/db:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: ${TZ}
+
+  nextcloud:
+    image: nextcloud:29
+    restart: unless-stopped
+    depends_on:
+      - db
+    volumes:
+      - ./data/nextcloud:/var/www/html
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    labels:
+      - "traefik.enable=true"
+
+      # Router HTTPS
+      - "traefik.http.routers.nextcloud.rule=Host(`${NEXTCLOUD_HOST}`)"
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
+      - "traefik.http.routers.nextcloud.tls.certresolver=letsencrypt"
+
+      # Serviço
+      - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+
+      # Headers recomendados pelo Nextcloud
+      - "traefik.http.middlewares.nextcloud-headers.headers.customRequestHeaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.nextcloud.middlewares=nextcloud-headers"
