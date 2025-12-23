@@ -11,6 +11,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       TZ: ${TZ}
+    networks:
+      - internal
 
   nextcloud:
     image: nextcloud:29
@@ -18,7 +20,11 @@ services:
     depends_on:
       - db
     volumes:
-      - ./data/nextcloud:/var/www/html
+      # código, config, apps
+      - nextcloud-app:/var/www/html
+
+      # dados dos usuários (NFS via volume Docker)
+      - nextcloud-data:/var/www/html/data
     environment:
       MYSQL_HOST: db
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -27,11 +33,14 @@ services:
       PUID: ${PUID}
       PGID: ${PGID}
       TZ: ${TZ}
+    networks:
+      - internal
+      - bridge-traefik-nextcloud
     labels:
       - "traefik.enable=true"
 
       # Router HTTPS
-      - "traefik.http.routers.nextcloud.rule=Host(`${NEXTCLOUD_HOST}`)"
+      - "traefik.http.routers.nextcloud.rule=Host(`drive.${DOCKER_DOMAIN}`)"
       - "traefik.http.routers.nextcloud.entrypoints=websecure"
       - "traefik.http.routers.nextcloud.tls.certresolver=letsencrypt"
 
@@ -41,3 +50,25 @@ services:
       # Headers recomendados pelo Nextcloud
       - "traefik.http.middlewares.nextcloud-headers.headers.customRequestHeaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.nextcloud.middlewares=nextcloud-headers"
+
+volumes:
+  # banco
+  db-data:
+
+  # app/config/apps do Nextcloud
+  nextcloud-app:
+
+  # dados em NFS (TrueNAS)
+  nextcloud-data:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=truenas-dmz.mfcaetano.lan,vers=4.1,rsize=1048576,wsize=1048576,timeo=600,retrans=5
+      device: :/mnt/vault/secure/data
+
+networks:
+  internal:
+    driver: bridge
+
+  bridge-traefik-nextcloud:
+    external: true

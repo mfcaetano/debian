@@ -17,6 +17,8 @@ services:
       - $PWD/traefik.yml:/etc/traefik/traefik.yml
       - /var/run/docker.sock:/var/run/docker.sock
       - $PWD/certs:/certs
+    networks:
+      - bridge-traefik-nextcloud
   whoami:
     image: traefik/whoami
     restart: unless-stopped
@@ -27,3 +29,6 @@ services:
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls=true"
 
+networks:
+  bridge-traefik-nextcloud:
+    external: true
