@@ -29,6 +29,8 @@ services:
       - "traefik.http.routers.whoami.rule=Host(`whoami.${DOCKER_DOMAIN}`)"
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls=true"
+    networks:
+      - traefik-net
 networks:
   traefik-net:
     external: true
