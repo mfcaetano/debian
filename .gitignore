@@ -1,2 +1,4 @@
 .env
 certs/
+# Nextcloud data (volumes persistentes)
+compose/nextcloud/data/
