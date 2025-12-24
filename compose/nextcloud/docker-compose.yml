@@ -1,19 +1,4 @@
 services:
-  db:
-    image: mariadb:11
-    restart: unless-stopped
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
-    volumes:
-      - ./data/db:/var/lib/mysql
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      TZ: ${TZ}
-    networks:
-      - internal
-
   nextcloud:
     image: nextcloud:29
     restart: unless-stopped
@@ -51,24 +36,3 @@ services:
       - "traefik.http.middlewares.nextcloud-headers.headers.customRequestHeaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.nextcloud.middlewares=nextcloud-headers"
 
-volumes:
-  # banco
-  db-data:
-
-  # app/config/apps do Nextcloud
-  nextcloud-app:
-
-  # dados em NFS (TrueNAS)
-  nextcloud-data:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=truenas-dmz.mfcaetano.lan,vers=4.1,rsize=1048576,wsize=1048576,timeo=600,retrans=5
-      device: :/mnt/vault/secure/data
-
-networks:
-  internal:
-    driver: bridge
-
-  bridge-traefik-nextcloud:
-    external: true

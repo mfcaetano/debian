@@ -1,0 +1,17 @@
+volumes:
+  # banco
+  db-data:
+  # app/config/apps do Nextcloud
+  nextcloud-app:
+  # dados em NFS (TrueNAS)
+  nextcloud-data:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=truenas-dmz.mfcaetano.lan,vers=4.1,rsize=1048576,wsize=1048576,timeo=600,retrans=5
+      device: :/mnt/vault/secure/data
+networks:
+  internal:
+    driver: bridge
+  bridge-traefik-nextcloud:
+    external: true
