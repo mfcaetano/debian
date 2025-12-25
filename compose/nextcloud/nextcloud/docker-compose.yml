@@ -1,13 +1,12 @@
 services:
   nextcloud:
-    image: nextcloud:29
+    image: nextcloud:32-apache
     restart: unless-stopped
     depends_on:
       - db
     volumes:
       # código, config, apps
-      - nextcloud-app:/var/www/html
-
+      - $PWD/var/data/nextcloud:/var/www/html
       # dados dos usuários (NFS via volume Docker)
       - nextcloud-data:/var/www/html/data
     environment:
@@ -36,4 +35,18 @@ services:
       # Headers recomendados pelo Nextcloud
       - "traefik.http.middlewares.nextcloud-headers.headers.customRequestHeaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.nextcloud.middlewares=nextcloud-headers"
-
+volumes:
+  # dados em NFS (TrueNAS)
+  nextcloud-data:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=truenas-dmz.mfcaetano.lan,vers=4.1,rsize=1048576,wsize=1048576,timeo=600,retrans=5
+      device: :/mnt/vault/secure/data
+networks:
+  nextcloud_internal:
+    external: true
+  bridge-traefik-nextcloud:
+    external: true
+  internal-services:
+    external: true

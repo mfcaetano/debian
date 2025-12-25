@@ -15,7 +15,7 @@ services:
       - "443:443"
     volumes:
       - $PWD/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $PWD/traefik/docker.sock:/var/run/docker.sock:ro
       - $PWD/var/certs:/certs
       - $PWD/var/logs:/logs
     networks:
