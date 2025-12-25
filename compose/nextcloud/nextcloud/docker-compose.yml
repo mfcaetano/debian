@@ -19,8 +19,9 @@ services:
       PGID: ${PGID}
       TZ: ${TZ}
     networks:
-      - internal
+      - nextcloud_internal
       - bridge-traefik-nextcloud
+      - internal-services
     labels:
       - "traefik.enable=true"
 

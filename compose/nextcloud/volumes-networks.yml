@@ -11,7 +11,9 @@ volumes:
       o: addr=truenas-dmz.mfcaetano.lan,vers=4.1,rsize=1048576,wsize=1048576,timeo=600,retrans=5
       device: :/mnt/vault/secure/data
 networks:
-  internal:
-    driver: bridge
+  nextcloud_internal:
+    external: true
   bridge-traefik-nextcloud:
+    external: true
+  internal-services:
     external: true
