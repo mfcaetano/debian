@@ -14,12 +14,11 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - $PWD/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - $PWD/traefik/docker.sock:/var/run/docker.sock:ro
-      - $PWD/var/certs:/certs
-      - $PWD/var/logs:/logs
+      - $PWD/traefik/traefik.yml:/etc/traefik/traefik.yml
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - $PWD/var/config/traefik/certs:/certs
     networks:
-      - traefik-net
+      - traefik
   whoami:
     image: traefik/whoami
     restart: unless-stopped
@@ -30,8 +29,7 @@ services:
       - "traefik.http.routers.whoami.entrypoints=websecure"
       - "traefik.http.routers.whoami.tls=true"
     networks:
-      - traefik-net
+      - traefik
 networks:
-  traefik-net:
+  traefik:
     external: true
-    name: bridge-traefik-nextcloud

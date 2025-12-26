@@ -13,3 +13,9 @@ services:
       TZ: ${TZ}
     networks:
       - nextcloud_internal
+    labels:
+      - "traefik.enable=false"
+networks:
+  nextcloud_internal:
+    external: true
+
